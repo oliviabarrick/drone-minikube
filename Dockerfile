@@ -1,7 +1,7 @@
 FROM alpine:3.6
 MAINTAINER Presslabs <ping@presslabs.com>
            
-ARG KUBE_VERSION=1.7.5
+ARG KUBE_VERSION=1.9.0
 ARG MINIKUBE_VERSION=0.25.0
 
 WORKDIR /root

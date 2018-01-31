@@ -18,6 +18,6 @@ pipeline:
 
 services:
   minikube:
-    image: presslabs/docker-minikube:v1.7.5
+    image: presslabs/drone-minikube:v1.9.0
     privileged: true
 ```
