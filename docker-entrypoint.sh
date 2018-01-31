@@ -11,6 +11,16 @@ sudo dockerd \
         --host=tcp://0.0.0.0:2375  \
         --storage-driver=vfs &
 
+if [ "$GOOGLE_CREDENTIALS" = "" ]; then
+    echo "### Login to docker to gcr.io ..."
+    sudo docker login -u _json_key -p "$GOOGLE_CREDENTIALS" https://gcr.io
+fi
+
+if [ "$DOCKER_USER" = "" ]; then
+    echo "### Login to docker to gcr.io ..."
+    sudo docker login -u "$DOCKER_USER" -p "$DOCKER_PASSWORD"
+fi
+
 export DOCKER_HOST="tcp://127.0.0.1:2375"
 
 if [ "$1" == "start" ]; then

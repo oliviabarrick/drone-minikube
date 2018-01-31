@@ -20,4 +20,10 @@ services:
   minikube:
     image: presslabs/drone-minikube:v1.9.0
     privileged: true
+    # optional: docker login
+    secrets:
+      - GOOGLE_CREDENTIALS  # for gcr.io
+    # or for docker hub
+    #  - DOCKER_USER
+    #  - DOCKER_PASSWORD
 ```
