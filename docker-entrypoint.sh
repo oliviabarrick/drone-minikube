@@ -13,6 +13,18 @@ sudo dockerd \
 
 export DOCKER_HOST="tcp://127.0.0.1:2375"
 
+sleep 2 # wait for docker demon to wake up
+
+if [ "$GOOGLE_CREDENTIALS" = "" ]; then
+    echo "### Login to docker to gcr.io ..."
+    sudo docker login -u _json_key -p "$GOOGLE_CREDENTIALS" https://gcr.io
+fi
+
+if [ "$DOCKER_USER" = "" ]; then
+    echo "### Login to docker to gcr.io ..."
+    sudo docker login -u "$DOCKER_USER" -p "$DOCKER_PASSWORD"
+fi
+
 if [ "$1" == "start" ]; then
     echo "### Starting minikube (k8s version: $KUBERNETES_VERSION)..."
     sudo minikube start \
