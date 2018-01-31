@@ -32,6 +32,20 @@ if [ "$1" == "start" ]; then
     echo "### Setting kubeconfig context..."
     sudo minikube update-context
 
+    if [ -d "$DRONE_WORKSPACE" ]; then
+        base=${DRONE_WORKSPACE:1}
+        base="/${base%%/*}"
+        echo "### Deploy .kube to $base ..."
+
+        cp -r /root/.kube $base
+        cp /root/.minikube/client.* $base/.kube/
+        cp /root/.minikube/ca.crt $base/.kube/
+
+        # replace new path in config
+        sed -i "s/\/root\/.minikube/\\$base\/.kube/g" $base/.kube/config
+        chmod o+r -R $base/.kube
+    fi
+
     echo "### Waiting for minkube to be ready..."
     # this for loop waits until kubectl can access the api server that Minikube has created
     set +e
@@ -44,6 +58,8 @@ if [ "$1" == "start" ]; then
         sleep 2
         j=$(( j + 1 ))
     done
+
+    set -e
 
     if [[ -d "/kube_specs" ]]; then
         echo "### Apply kubernetes specs..."
