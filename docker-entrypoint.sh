@@ -13,11 +13,6 @@ sudo dockerd \
 
 export DOCKER_HOST="tcp://127.0.0.1:2375"
 
-# set docker settings
-#echo "export DOCKER_HOST='tcp://127.0.0.1:2375'" >> /etc/profile
-# reread all config
-#source /etc/profile
-
 if [ "$1" == "start" ]; then
     echo "### Starting minikube (k8s version: $KUBERNETES_VERSION)..."
     sudo minikube start \
@@ -32,22 +27,8 @@ if [ "$1" == "start" ]; then
     echo "### Setting kubeconfig context..."
     sudo minikube update-context
 
-    if [ -d "$DRONE_WORKSPACE" ]; then
-        base=${DRONE_WORKSPACE:1}
-        base="/${base%%/*}"
-        echo "### Deploy .kube to $base ..."
-
-        cp -r /root/.kube $base
-        cp /root/.minikube/client.* $base/.kube/
-        cp /root/.minikube/ca.crt $base/.kube/
-
-        # replace new path in config
-        sed -i "s/\/root\/.minikube/\\$base\/.kube/g" $base/.kube/config
-        chmod o+r -R $base/.kube
-    fi
-
     echo "### Waiting for minkube to be ready..."
-    # this for loop waits until kubectl can access the api server that Minikube has created
+    # waits for api server to be up
     set +e
     j=0
     while [ $j -le 150 ]; do
@@ -58,15 +39,25 @@ if [ "$1" == "start" ]; then
         sleep 2
         j=$(( j + 1 ))
     done
-
     set -e
 
-    if [[ -d "/kube_specs" ]]; then
-        echo "### Apply kubernetes specs..."
-        kubectl apply -R -f /kube_specs/
+    echo "### Minikube is ready."
+
+    if [ -d "$DRONE_WORKSPACE" ]; then
+        base=${DRONE_WORKSPACE:1}
+        base="/${base%%/*}"
+        echo "### Deploy .kube to $base ..."
+
+        cp -r /root/.kube $base/.kube.orig
+        cp /root/.minikube/client.* $base/.kube.orig/
+        cp /root/.minikube/ca.crt $base/.kube.orig/
+
+        # replace new path in config
+        sed -i "s/\/root\/.minikube/\\$base\/.kube/g" $base/.kube.orig/config
+        chmod o+r -R $base/.kube.orig
+        mv $base/.kube.orig $base/.kube
     fi
 
-    echo "### Minikube is ready."
     minikube logs -f
 fi
 
