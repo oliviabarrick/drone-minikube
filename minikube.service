@@ -1,0 +1,16 @@
+[Unit]
+Description=Minikube
+After=docker.service
+Requires=docker.service
+
+[Service]
+ExecStartPre=/bin/mount --make-rshared /
+ExecStart=/usr/local/bin/minikube start --kubernetes-version=v1.10.0 \
+    --bootstrapper=kubeadm --memory 1024 --disk-size 4g --vm-driver=none
+ExecStartPost=/usr/local/bin/minikube update-context
+WorkingDirectory=/root
+Environment="MINIKUBE_HOME=/root/.minikube"
+Type=oneshot
+
+[Install]
+WantedBy=multi-user.target
