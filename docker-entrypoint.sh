@@ -33,6 +33,7 @@ if [ "$1" == "start" ]; then
         --extra-config=apiserver.Audit.LogOptions.MaxAge=30 \
         --extra-config=apiserver.Audit.LogOptions.MaxSize=100 \
         --extra-config=apiserver.Audit.LogOptions.MaxBackups=5 \
+        --extra-config=apiserver.Authorization.Mode=RBAC \
         --bootstrapper=localkube \
         --vm-driver=none
 
@@ -54,6 +55,7 @@ if [ "$1" == "start" ]; then
     set -e
 
     echo "### Minikube is ready."
+    kubectl create clusterrolebinding add-on-cluster-admin --clusterrole=cluster-admin --serviceaccount=kube-system:default
 
     if [ -d "$DRONE_WORKSPACE" ]; then
         base=${DRONE_WORKSPACE:1}
