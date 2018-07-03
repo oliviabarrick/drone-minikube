@@ -45,7 +45,8 @@ if [ "$1" == "start" ]; then
     set +e
     j=0
     while [ $j -le 150 ]; do
-        kubectl get po &> /dev/null
+        kubectl create clusterrolebinding dns-admin \
+            --clusterrole=cluster-admin --serviceaccount=kube-system:default &> /dev/null
         if [ $? -ne 1 ]; then
             break
         fi
@@ -55,8 +56,6 @@ if [ "$1" == "start" ]; then
     set -e
 
     echo "### Minikube is ready."
-    kubectl create clusterrolebinding add-on-cluster-admin --clusterrole=cluster-admin --serviceaccount=kube-system:default
-
     if [ -d "$DRONE_WORKSPACE" ]; then
         base=${DRONE_WORKSPACE:1}
         base="/${base%%/*}"
